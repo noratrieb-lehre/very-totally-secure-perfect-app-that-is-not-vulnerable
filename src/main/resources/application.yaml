@@ -1,0 +1,25 @@
+spring:
+  output:
+    ansi:
+      enabled: ALWAYS
+  datasource:
+    url: jdbc:h2:mem:mydb
+    driverClassName: org.h2.Driver
+  jpa:
+    database-platform: org.hibernate.dialect.H2Dialect
+    open-in-view: false
+  web:
+    resources:
+      static-locations: # quickhack to facilitate static development
+        - file:src/main/resources/static/
+        - classpath:/static/
+logging:
+  pattern:
+    dateformat: HH:mm:ss
+  level:
+    org.hibernate.SQL: DEBUG
+management:
+  endpoints:
+    web:
+      exposure:
+        include: '*'
