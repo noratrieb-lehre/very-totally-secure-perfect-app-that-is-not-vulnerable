@@ -27,8 +27,11 @@ public class BasicConfiguration {
 
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
-        http.authorizeRequests().anyRequest().authenticated().and().httpBasic();
-        return http.build();
+        return http.httpBasic(basic -> basic.realmName("vulnerapp"))
+                .csrf(cfg -> cfg.disable())
+                .authorizeHttpRequests(auth ->
+                        auth.requestMatchers("/api/**").authenticated()
+                ).build();
     }
 
     @Bean
