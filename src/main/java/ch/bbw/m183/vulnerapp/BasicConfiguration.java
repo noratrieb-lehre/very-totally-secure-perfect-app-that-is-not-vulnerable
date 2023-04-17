@@ -31,6 +31,7 @@ public class BasicConfiguration {
                 .csrf(cfg -> cfg.disable())
                 .authorizeHttpRequests(auth ->
                         auth.requestMatchers("/api/**").authenticated()
+                                // .anyRequest().permitAll()
                 ).build();
     }
 
