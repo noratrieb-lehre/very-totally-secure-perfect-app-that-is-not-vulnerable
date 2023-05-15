@@ -28,12 +28,15 @@ function onLogoutSubmit(event) {
 }
 
 function onBlogSubmit(event) {
+    const csrfToken = document.cookie.replace(/(?:(?:^|.*;\s*)XSRF-TOKEN\s*\=\s*([^;]*).*$)|^.*$/, '$1');
+
     const data = {"title": event.target[0].value, "body": event.target[1].value}
     event.preventDefault();
     fetch("/api/blog", {
         method: "POST",
         headers: {
             "Content-Type": "application/json",
+            "X-XSRF-TOKEN": csrfToken,
         },
         body: JSON.stringify(data),
     }).then(filterOk)

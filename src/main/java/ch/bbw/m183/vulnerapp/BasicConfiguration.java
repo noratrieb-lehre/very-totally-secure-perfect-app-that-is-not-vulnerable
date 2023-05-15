@@ -11,6 +11,8 @@ import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.factory.PasswordEncoderFactories;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
+import org.springframework.security.web.csrf.CookieCsrfTokenRepository;
+import org.springframework.security.web.csrf.CsrfTokenRequestAttributeHandler;
 
 import java.util.Collections;
 
@@ -27,8 +29,14 @@ public class BasicConfiguration {
 
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
+        var handler = new CsrfTokenRequestAttributeHandler();
+        handler.setCsrfRequestAttributeName(null);
+
         return http.httpBasic(basic -> basic.realmName("vulnerapp"))
-                .csrf(cfg -> cfg.disable())
+                .csrf(cfg ->
+                        cfg.csrfTokenRepository(CookieCsrfTokenRepository.withHttpOnlyFalse())
+                                .csrfTokenRequestHandler(handler)
+                )
                 .authorizeHttpRequests(auth ->
                         auth.requestMatchers("/api/**").authenticated()
                                 .anyRequest().permitAll()
