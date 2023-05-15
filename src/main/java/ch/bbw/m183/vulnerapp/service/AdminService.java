@@ -25,7 +25,7 @@ public class AdminService {
 	private final PasswordEncoder passwordEncoder;
 
 	public UserEntity createUser(UserEntity newUser) {
-		return userRepository.save(newUser);
+		return userRepository.save(newUser.setPassword(passwordEncoder.encode(newUser.getPassword())));
 	}
 
 	public Page<UserEntity> getUsers(Pageable pageable) {
