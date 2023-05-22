@@ -3,6 +3,7 @@ package ch.bbw.m183.vulnerapp;
 import ch.bbw.m183.vulnerapp.repository.UserRepository;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.http.HttpMethod;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.core.userdetails.User;
@@ -38,7 +39,9 @@ public class BasicConfiguration {
                                 .csrfTokenRequestHandler(handler)
                 )
                 .authorizeHttpRequests(auth ->
-                        auth.requestMatchers("/api/**").authenticated()
+                        auth.requestMatchers(HttpMethod.GET, "/api/blog")
+                                .permitAll()
+                                .requestMatchers("/api/**").authenticated()
                                 .anyRequest().permitAll()
                 ).build();
     }
