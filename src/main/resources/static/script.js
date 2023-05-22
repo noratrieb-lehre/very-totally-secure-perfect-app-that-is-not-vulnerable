@@ -27,8 +27,12 @@ function onLogoutSubmit(event) {
         .then(() => loginCheck());
 }
 
+function getCsrfToken() {
+    return document.cookie.replace(/(?:(?:^|.*;\s*)XSRF-TOKEN\s*\=\s*([^;]*).*$)|^.*$/, '$1');
+}
+
 function onBlogSubmit(event) {
-    const csrfToken = document.cookie.replace(/(?:(?:^|.*;\s*)XSRF-TOKEN\s*\=\s*([^;]*).*$)|^.*$/, '$1');
+    const csrfToken = getCsrfToken();
 
     const data = {"title": event.target[0].value, "body": event.target[1].value}
     event.preventDefault();
