@@ -1,12 +1,11 @@
 package ch.bbw.m183.vulnerapp.datamodel;
 
-import jakarta.persistence.Column;
-import jakarta.persistence.Entity;
-import jakarta.persistence.Id;
-import jakarta.persistence.Table;
+import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.experimental.Accessors;
+
+import java.util.Collection;
 
 @Getter
 @Setter
@@ -15,13 +14,22 @@ import lombok.experimental.Accessors;
 @Table(name = "users")
 public class UserEntity {
 
-	@Id
-	String username;
+    @Id
+    String username;
 
-	@Column
-	String fullname;
+    @Column
+    String fullname;
 
-	@Column
-	String password;
+    @Column
+    String password;
+
+    @ManyToMany
+    @JoinTable(
+            name = "users_roles",
+            joinColumns = @JoinColumn(
+                    name = "user_id", referencedColumnName = "username"),
+            inverseJoinColumns = @JoinColumn(
+                    name = "role_id", referencedColumnName = "id"))
+    private Collection<Role> roles;
 
 }
