@@ -71,7 +71,7 @@ public class AdminService {
                         .setRoles(List.of(admin)),
                 new UserEntity().setUsername("fuu")
                         .setFullname("Johanna Doe")
-                        .setPassword("bar")
+                        .setPassword("barbarfoo")
                         .setRoles(List.of(poster)),
                 new UserEntity().setUsername("thesHyper7")
                         .setFullname("Desir Eh")

@@ -16,8 +16,8 @@ spring:
 logging:
   pattern:
     dateformat: HH:mm:ss
-  level:
-    org.hibernate.SQL: DEBUG
+  level.org.hibernate.SQL: DEBUG
+  level: DEBUG
 management:
   endpoints:
     web:
