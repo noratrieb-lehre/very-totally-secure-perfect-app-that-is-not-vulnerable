@@ -1,6 +1,5 @@
 package ch.bbw.m183.vulnerapp;
 
-import ch.bbw.m183.vulnerapp.repository.PrivilegeRepository;
 import ch.bbw.m183.vulnerapp.repository.RoleRepository;
 import ch.bbw.m183.vulnerapp.repository.UserRepository;
 import ch.bbw.m183.vulnerapp.service.MyAwesomeUserDetailsService;
@@ -29,8 +28,11 @@ public class BasicConfiguration {
     */
 
     @Bean
-    public UserDetailsService userDetailsService(UserRepository userRepository, RoleRepository roleRepository, PrivilegeRepository privilegeRepository) {
-        return new MyAwesomeUserDetailsService(userRepository, roleRepository, privilegeRepository);
+    public UserDetailsService userDetailsService(
+            UserRepository userRepository,
+            RoleRepository roleRepository
+    ) {
+        return new MyAwesomeUserDetailsService(userRepository, roleRepository);
     }
 
     @Bean
@@ -39,16 +41,17 @@ public class BasicConfiguration {
         handler.setCsrfRequestAttributeName(null);
 
         return http.httpBasic(basic -> basic.realmName("vulnerapp"))
-                .csrf(cfg ->
-                        cfg.csrfTokenRepository(CookieCsrfTokenRepository.withHttpOnlyFalse())
-                                .csrfTokenRequestHandler(handler)
-                )
-                .authorizeHttpRequests(auth ->
-                        auth.requestMatchers(HttpMethod.GET, "/api/blog")
-                                .permitAll()
-                                .requestMatchers("/api/**").authenticated()
-                                .anyRequest().permitAll()
-                ).build();
+                .csrf(cfg -> cfg.csrfTokenRepository(CookieCsrfTokenRepository.withHttpOnlyFalse())
+                        .csrfTokenRequestHandler(handler))
+                .authorizeHttpRequests(auth -> auth.requestMatchers(HttpMethod.GET, "/api/blog")
+                        .permitAll()
+                        .requestMatchers("/api/**")
+                        .authenticated()
+                        .requestMatchers("/api/user/**")
+                        .permitAll()
+                        .anyRequest()
+                        .permitAll())
+                .build();
     }
 
     @Bean
