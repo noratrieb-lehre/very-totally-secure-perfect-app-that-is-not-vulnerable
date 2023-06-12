@@ -1,6 +1,7 @@
 package ch.bbw.m183.vulnerapp.datamodel;
 
 import jakarta.persistence.*;
+import jakarta.validation.constraints.NotBlank;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -17,6 +18,7 @@ public class Role {
     @GeneratedValue(strategy = GenerationType.AUTO)
     private Long id;
 
+    @NotBlank(message = "name must not be empty")
     private String name;
     @ManyToMany(mappedBy = "roles")
     private Collection<UserEntity> users;

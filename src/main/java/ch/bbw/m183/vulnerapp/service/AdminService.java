@@ -18,6 +18,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Collection;
 import java.util.List;
+import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 @Service
@@ -32,6 +33,14 @@ public class AdminService {
 
     @PreAuthorize("hasRole('ADMIN')")
     public UserEntity createUser(UserEntity newUser) {
+        // enforce crude password rules.
+        if (newUser.getPassword().length() < 8) {
+            throw new IllegalArgumentException("Password is too short, must be more than 7 characters.");
+        }
+        if (newUser.getPassword().chars().boxed().collect(Collectors.toSet()).size() < 4) {
+            throw new IllegalArgumentException("Password must consist of at least 4 unique characters.");
+        }
+
         return userRepository.save(newUser.setPassword(passwordEncoder.encode(newUser.getPassword())));
     }
 
@@ -55,19 +64,20 @@ public class AdminService {
         var poster = createRoleIfNotFound("POSTER", List.of(posterPrivilege, readPrivilege));
         var reader = createRoleIfNotFound("READER", List.of(readPrivilege));
 
-        Stream.of(new UserEntity().setUsername("admin")
-                                .setFullname("Super Admin")
-                                .setPassword("super5ecret")
-                                .setRoles(List.of(admin)),
-                        new UserEntity().setUsername("fuu")
-                                .setFullname("Johanna Doe")
-                                .setPassword("bar")
-                                .setRoles(List.of(poster)),
-                        new UserEntity().setUsername("thesHyper7")
-                                .setFullname("Desir Eh")
-                                .setPassword("m/u5wvGRaUX1XBnXneOpktnfRqPCnG7+ogXFUv6Mgf6SQxws8Rq2hoMEKLZEdIHoE0qsbEvgTdBVRqaH")
-                                .setRoles(List.of(reader)))
-                .forEach(this::createUser);
+        Stream.of(
+                new UserEntity().setUsername("admin")
+                        .setFullname("Super Admin")
+                        .setPassword("super5ecret")
+                        .setRoles(List.of(admin)),
+                new UserEntity().setUsername("fuu")
+                        .setFullname("Johanna Doe")
+                        .setPassword("bar")
+                        .setRoles(List.of(poster)),
+                new UserEntity().setUsername("thesHyper7")
+                        .setFullname("Desir Eh")
+                        .setPassword("m/u5wvGRaUX1XBnXneOpktnfRqPCnG7+ogXFUv6Mgf6SQxws8Rq2hoMEKLZEdIHoE0qsbEvgTdBVRqaH")
+                        .setRoles(List.of(reader))
+        ).forEach(this::createUser);
     }
 
     @jakarta.transaction.Transactional
