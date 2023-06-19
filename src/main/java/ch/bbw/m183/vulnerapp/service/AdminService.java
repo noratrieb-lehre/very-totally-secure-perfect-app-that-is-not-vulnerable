@@ -1,45 +1,83 @@
 package ch.bbw.m183.vulnerapp.service;
 
-import java.util.stream.Stream;
-
+import ch.bbw.m183.vulnerapp.datamodel.Role;
 import ch.bbw.m183.vulnerapp.datamodel.UserEntity;
+import ch.bbw.m183.vulnerapp.repository.RoleRepository;
 import ch.bbw.m183.vulnerapp.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.event.ContextRefreshedEvent;
 import org.springframework.context.event.EventListener;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
-import org.springframework.security.core.userdetails.UserDetails;
-import org.springframework.security.core.userdetails.UserDetailsService;
-import org.springframework.security.core.userdetails.UsernameNotFoundException;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+
+import java.util.List;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 @Service
 @Transactional
 @RequiredArgsConstructor
 public class AdminService {
 
-	private final UserRepository userRepository;
-	private final PasswordEncoder passwordEncoder;
+    private final UserRepository userRepository;
+    private final RoleRepository roleRepository;
+    private final PasswordEncoder passwordEncoder;
 
-	public UserEntity createUser(UserEntity newUser) {
-		return userRepository.save(newUser.setPassword(passwordEncoder.encode(newUser.getPassword())));
-	}
+    @PreAuthorize("hasAuthority('ADMIN')")
+    public UserEntity createUser(UserEntity newUser) {
+        // enforce crude password rules.
+        if (newUser.getPassword().length() < 8) {
+            throw new IllegalArgumentException("Password is too short, must be more than 7 characters.");
+        }
+        if (newUser.getPassword().chars().boxed().collect(Collectors.toSet()).size() < 4) {
+            throw new IllegalArgumentException("Password must consist of at least 4 unique characters.");
+        }
 
-	public Page<UserEntity> getUsers(Pageable pageable) {
-		return userRepository.findAll(pageable);
-	}
+        return userRepository.save(newUser.setPassword(passwordEncoder.encode(newUser.getPassword())));
+    }
 
-	public void deleteUser(String username) {
-		userRepository.deleteById(username);
-	}
+    @PreAuthorize("hasAuthority('ADMIN')")
+    public Page<UserEntity> getUsers(Pageable pageable) {
+        return userRepository.findAll(pageable);
+    }
 
-	@EventListener(ContextRefreshedEvent.class)
-	public void loadTestUsers() {
-		Stream.of(new UserEntity().setUsername("admin").setFullname("Super Admin").setPassword("super5ecret"),
-						new UserEntity().setUsername("fuu").setFullname("Johanna Doe").setPassword("bar"))
-				.forEach(this::createUser);
-	}
+    @PreAuthorize("hasAuthority('ADMIN')")
+    public void deleteUser(String username) {
+        userRepository.deleteById(username);
+    }
+
+    @EventListener(ContextRefreshedEvent.class)
+    public void loadTestUsers() {
+        var admin = createRoleIfNotFound("ADMIN");
+        var poster = createRoleIfNotFound("POSTER");
+        var reader = createRoleIfNotFound("READER");
+
+        Stream.of(
+                new UserEntity().setUsername("admin")
+                        .setFullname("Super Admin")
+                        .setPassword("super5ecret")
+                        .setRoles(List.of(admin)),
+                new UserEntity().setUsername("fuu")
+                        .setFullname("Johanna Doe")
+                        .setPassword("barbarfoo")
+                        .setRoles(List.of(poster)),
+                new UserEntity().setUsername("thesHyper7")
+                        .setFullname("Desir Eh")
+                        .setPassword("m/u5wvGRaUX1XBnXneOpktnfRqPCnG7+ogXFUv6Mgf6SQxws8Rq2hoMEKLZEdIHoE0qsbEvgTdBVRqaH")
+                        .setRoles(List.of(reader))
+        ).forEach(this::createUser);
+    }
+
+    @Transactional
+    Role createRoleIfNotFound(String name) {
+        return roleRepository.findByName(name).orElseGet(() -> {
+            var role = new Role(name);
+            roleRepository.save(role);
+            return role;
+        });
+    }
 }

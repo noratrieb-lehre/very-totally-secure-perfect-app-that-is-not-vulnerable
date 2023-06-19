@@ -17,8 +17,20 @@ logging:
   pattern:
     dateformat: HH:mm:ss
   level:
-    org.hibernate.SQL: DEBUG
-management:
+    root: TRACE
+    org:
+      springframework:
+        beans:
+          factory:
+            support:
+              DefaultListableBeanFactory: INFO
+      apache:
+        tomcat:
+          util:
+            net:
+              NioEndpoint: INFO
+    sun:
+      rmi: INFO
   endpoints:
     web:
       exposure:

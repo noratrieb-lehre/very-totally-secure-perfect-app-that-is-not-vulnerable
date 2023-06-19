@@ -1,12 +1,12 @@
 package ch.bbw.m183.vulnerapp.datamodel;
 
-import jakarta.persistence.Column;
-import jakarta.persistence.Entity;
-import jakarta.persistence.Id;
-import jakarta.persistence.Table;
+import jakarta.persistence.*;
+import jakarta.validation.constraints.NotBlank;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.experimental.Accessors;
+
+import java.util.Collection;
 
 @Getter
 @Setter
@@ -15,13 +15,17 @@ import lombok.experimental.Accessors;
 @Table(name = "users")
 public class UserEntity {
 
-	@Id
-	String username;
+    @Id
+    @NotBlank(message = "username must not be empty") String username;
 
-	@Column
-	String fullname;
+    @Column
+    @NotBlank(message = "full name must not be empty") String fullname;
 
-	@Column
-	String password;
+    @Column
+    @NotBlank(message = "password must not be empty") String password;
+
+    @ManyToMany(fetch = FetchType.EAGER)
+    @JoinTable(name = "users_roles", joinColumns = @JoinColumn(name = "user_id", referencedColumnName = "username"), inverseJoinColumns = @JoinColumn(name = "role_id", referencedColumnName = "id"))
+    private Collection<Role> roles;
 
 }

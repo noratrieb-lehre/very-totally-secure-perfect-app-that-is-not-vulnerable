@@ -12,7 +12,7 @@ import java.nio.charset.StandardCharsets;
 import java.util.Base64;
 
 @AutoConfigureMockMvc
-@SpringBootTest
+@SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 public class AdminApiTests implements WithAssertions {
     @Autowired
     private WebTestClient webClient;

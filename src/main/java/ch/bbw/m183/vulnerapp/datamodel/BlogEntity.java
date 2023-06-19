@@ -1,16 +1,18 @@
 package ch.bbw.m183.vulnerapp.datamodel;
 
-import java.time.LocalDateTime;
-import java.util.UUID;
-
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.Id;
 import jakarta.persistence.Table;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.experimental.Accessors;
 import org.hibernate.annotations.CreationTimestamp;
+
+import java.time.LocalDateTime;
+import java.util.UUID;
 
 @Getter
 @Setter
@@ -19,16 +21,16 @@ import org.hibernate.annotations.CreationTimestamp;
 @Table(name = "blogs")
 public class BlogEntity {
 
-	@Id
-	UUID id;
+    @Id
+    UUID id;
 
-	@Column
-	@CreationTimestamp
-	LocalDateTime createdAt;
+    @Column
+    @CreationTimestamp
+    @NotNull(message = "created date must be specified") LocalDateTime createdAt;
 
-	@Column(columnDefinition = "text")
-	String title;
+    @Column(columnDefinition = "text")
+    @NotBlank(message = "Title must not be empty") String title;
 
-	@Column(columnDefinition = "text")
-	String body;
+    @Column(columnDefinition = "text")
+    @NotBlank(message = "Body must not be empty") String body;
 }
