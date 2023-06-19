@@ -56,7 +56,7 @@ public class AdminService {
                 new UserEntity().setUsername("admin")
                         .setFullname("Super Admin")
                         .setPassword("super5ecret")
-                        .setRoles(List.of(admin)),
+                        .setRoles(List.of(admin, poster)),
                 new UserEntity().setUsername("fuu")
                         .setFullname("Johanna Doe")
                         .setPassword("barbarfoo")
