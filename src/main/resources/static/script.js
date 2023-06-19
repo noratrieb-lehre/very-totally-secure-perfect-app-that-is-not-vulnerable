@@ -9,14 +9,18 @@ function onLoginSubmit(event) {
     const username = event.target[0].value;
     const password = event.target[1].value;
     event.preventDefault();
-    fetch("/api/user/whoami", {
+    fetch("/api/user/login", {
+        method: 'POST',
         headers: {
             "Content-Type": "application/json",
-            "Authorization": "Basic " + btoa(username + ":" + password),
         },
+        body: JSON.stringify({username, password}),
     }).then(filterOk)
         .then(response => response.json())
-        .then(user => window.sessionStorage.setItem("fullname", user.fullname))
+        .then(response => {
+            window.sessionStorage.setItem("token", response.token)
+            window.sessionStorage.setItem("fullname", response.fullname)
+        })
         .then(() => loginCheck());
 }
 
@@ -39,6 +43,7 @@ function onBlogSubmit(event) {
     fetch("/api/blog", {
         method: "POST",
         headers: {
+            "Authorization": `Bearer ${window.sessionStorage.getItem("token")}`,
             "Content-Type": "application/json",
             "X-XSRF-TOKEN": csrfToken,
         },
@@ -75,7 +80,7 @@ function renderBlogs(blogs) {
 }
 
 function filterOk(response) {
-    if(response.ok) {
+    if (response.ok) {
         return response;
     }
     return Promise.reject(response);
