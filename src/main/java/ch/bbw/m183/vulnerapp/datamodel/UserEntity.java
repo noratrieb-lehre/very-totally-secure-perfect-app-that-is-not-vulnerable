@@ -5,6 +5,7 @@ import jakarta.validation.constraints.NotBlank;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.experimental.Accessors;
+import org.hibernate.validator.constraints.Length;
 
 import java.util.Collection;
 
@@ -22,7 +23,9 @@ public class UserEntity {
     @NotBlank(message = "full name must not be empty") String fullname;
 
     @Column
-    @NotBlank(message = "password must not be empty") String password;
+    @NotBlank(message = "password must not be empty")
+    @Length(min = 8)
+    String password;
 
     @ManyToMany(fetch = FetchType.EAGER)
     @JoinTable(name = "users_roles", joinColumns = @JoinColumn(name = "user_id", referencedColumnName = "username"), inverseJoinColumns = @JoinColumn(name = "role_id", referencedColumnName = "id"))

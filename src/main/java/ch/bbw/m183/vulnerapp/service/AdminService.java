@@ -29,10 +29,6 @@ public class AdminService {
 
     @PreAuthorize("hasAuthority('ADMIN')")
     public UserEntity createUser(UserEntity newUser) {
-        // enforce crude password rules.
-        if (newUser.getPassword().length() < 8) {
-            throw new IllegalArgumentException("Password is too short, must be more than 7 characters.");
-        }
         if (newUser.getPassword().chars().boxed().collect(Collectors.toSet()).size() < 4) {
             throw new IllegalArgumentException("Password must consist of at least 4 unique characters.");
         }
