@@ -1,14 +1,12 @@
-package ch.bbw.m183.vulnerapp;
+package ch.bbw.m183.vulnerapp.security;
 
-import ch.bbw.m183.vulnerapp.repository.RoleRepository;
-import ch.bbw.m183.vulnerapp.repository.UserRepository;
-import ch.bbw.m183.vulnerapp.service.MyAwesomeUserDetailsService;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpMethod;
+import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
-import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.factory.PasswordEncoderFactories;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
@@ -17,24 +15,9 @@ import org.springframework.security.web.csrf.CsrfTokenRequestAttributeHandler;
 
 @Configuration
 @EnableWebSecurity
+@EnableMethodSecurity
+@Slf4j
 public class BasicConfiguration {
-    /*
-    @Bean
-    public UserDetailsService userDetailsService(UserRepository userRepository) {
-        return (username) -> userRepository.findById(username)
-                .map(entity -> new User(entity.getUsername(), entity.getPassword(), Collections.emptyList()))
-                .orElseThrow(() -> new UsernameNotFoundException("User " + username + " not found"));
-    }
-    */
-
-    @Bean
-    public UserDetailsService userDetailsService(
-            UserRepository userRepository,
-            RoleRepository roleRepository
-    ) {
-        return new MyAwesomeUserDetailsService(userRepository, roleRepository);
-    }
-
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
         var handler = new CsrfTokenRequestAttributeHandler();
