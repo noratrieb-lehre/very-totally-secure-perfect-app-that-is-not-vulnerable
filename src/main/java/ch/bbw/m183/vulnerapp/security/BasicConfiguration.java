@@ -33,7 +33,7 @@ public class BasicConfiguration {
                         .permitAll()
                         .requestMatchers("/api/**")
                         .authenticated()
-                        .requestMatchers("/api/user/**")
+                        .requestMatchers(HttpMethod.POST, "/api/user/login")
                         .permitAll()
                         .anyRequest()
                         .permitAll())
