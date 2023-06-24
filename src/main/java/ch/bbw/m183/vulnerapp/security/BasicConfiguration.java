@@ -14,6 +14,7 @@ import org.springframework.security.oauth2.server.resource.authentication.JwtGra
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.csrf.CookieCsrfTokenRepository;
 import org.springframework.security.web.csrf.CsrfTokenRequestAttributeHandler;
+import org.springframework.security.web.util.matcher.RequestMatcher;
 
 @Configuration
 @EnableWebSecurity
@@ -27,14 +28,16 @@ public class BasicConfiguration {
 
         return http.oauth2ResourceServer((server) -> server.jwt(jwt -> jwt.jwtAuthenticationConverter(
                         authenticationConverter())))
-                .csrf(cfg -> cfg.csrfTokenRepository(CookieCsrfTokenRepository.withHttpOnlyFalse())
+                .csrf(cfg -> cfg.ignoringRequestMatchers("/api/user/login")
+                        .csrfTokenRepository(CookieCsrfTokenRepository.withHttpOnlyFalse())
                         .csrfTokenRequestHandler(handler))
-                .authorizeHttpRequests(auth -> auth.requestMatchers(HttpMethod.GET, "/api/blog")
+                .authorizeHttpRequests(auth -> auth
+                        .requestMatchers(HttpMethod.POST, "/api/user/login")
+                        .permitAll()
+                        .requestMatchers(HttpMethod.GET, "/api/blog")
                         .permitAll()
                         .requestMatchers("/api/**")
                         .authenticated()
-                        .requestMatchers(HttpMethod.POST, "/api/user/login")
-                        .permitAll()
                         .anyRequest()
                         .permitAll())
                 .build();
