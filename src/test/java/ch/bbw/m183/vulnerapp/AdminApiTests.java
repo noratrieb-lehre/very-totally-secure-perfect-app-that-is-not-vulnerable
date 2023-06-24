@@ -8,14 +8,13 @@ import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMock
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.web.reactive.server.WebTestClient;
 
-import java.nio.charset.StandardCharsets;
-import java.util.Base64;
-
 @AutoConfigureMockMvc
-@SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
+@SpringBootTest
 public class AdminApiTests implements WithAssertions {
     @Autowired
     private WebTestClient webClient;
+    @Autowired
+    private TestHelper testHelper;
 
     @Test
     void createUserUnauthenticated() {
@@ -28,31 +27,29 @@ public class AdminApiTests implements WithAssertions {
     }
 
     @Test
-    void createUserAuthenticatedNoCsrf() {
-        webClient.post()
-                .uri("/api/admin123/create")
-                .header("Authorization", "Basic " + Base64.getEncoder()
-                        .encodeToString("admin:super5ecret".getBytes(StandardCharsets.UTF_8)))
-                .bodyValue(new UserEntity().setUsername("testuser").setPassword("not5secret").setFullname("test user"))
-                .exchange()
-                .expectStatus()
-                .isForbidden();
-    }
-
-    @Test
     void createUserAuthenticated() {
-        var csrfToken = "iJqUiW2G2gevMfz/xpk7fV1nLqYAeJUPNx4ZNHmx";
+        var authToken = testHelper.login("admin", "super5ecret");
 
         webClient.post()
                 .uri("/api/admin123/create")
-                .header("Authorization", "Basic " + Base64.getEncoder()
-                        .encodeToString("admin:super5ecret".getBytes(StandardCharsets.UTF_8)))
-                .header("X-XSRF-TOKEN", csrfToken)
-                .cookie("XSRF-TOKEN", csrfToken)
+                .header("Authorization", authToken)
                 .bodyValue(new UserEntity().setUsername("testuser").setPassword("not5secret").setFullname("test user"))
                 .exchange()
                 .expectStatus()
                 .isCreated();
+    }
+
+    @Test
+    void createUserNoPerms() {
+        var authToken = testHelper.login("thesHyper7", "mBnXneOpktnfRqPMgf6SQxwsBVRqaH");
+
+        webClient.post()
+                .uri("/api/admin123/create")
+                .header("Authorization", authToken)
+                .bodyValue(new UserEntity().setUsername("testuser").setPassword("not5secret").setFullname("test user"))
+                .exchange()
+                .expectStatus()
+                .isForbidden();
     }
 
     @Test
@@ -66,10 +63,11 @@ public class AdminApiTests implements WithAssertions {
 
     @Test
     void getUsersAuthenticated() {
+        var authToken = testHelper.login("admin", "super5ecret");
+
         webClient.get()
                 .uri("/api/admin123/users")
-                .header("Authorization", "Basic " + Base64.getEncoder()
-                        .encodeToString("admin:super5ecret".getBytes(StandardCharsets.UTF_8)))
+                .header("Authorization", authToken)
                 .exchange()
                 .expectStatus()
                 .isOk();
@@ -84,27 +82,14 @@ public class AdminApiTests implements WithAssertions {
                 .isForbidden();
     }
 
-    @Test
-    void deleteUserAuthenticatedNoCsrf() {
-        webClient.delete()
-                .uri("/api/admin123/delete/fuu")
-                .header("Authorization", "Basic " + Base64.getEncoder()
-                        .encodeToString("admin:super5ecret".getBytes(StandardCharsets.UTF_8)))
-                .exchange()
-                .expectStatus()
-                .isForbidden();
-    }
 
     @Test
     void deleteUserAuthenticated() {
-        var csrfToken = "iJqUiW2G2gevMfz/xpk7fV1nLqYAeJUPNx4ZNHmx";
+        var authToken = testHelper.login("admin", "super5ecret");
 
         webClient.delete()
                 .uri("/api/admin123/delete/fuu")
-                .header("Authorization", "Basic " + Base64.getEncoder()
-                        .encodeToString("admin:super5ecret".getBytes(StandardCharsets.UTF_8)))
-                .header("X-XSRF-TOKEN", csrfToken)
-                .cookie("XSRF-TOKEN", csrfToken)
+                .header("Authorization", authToken)
                 .exchange()
                 .expectStatus()
                 .isOk();

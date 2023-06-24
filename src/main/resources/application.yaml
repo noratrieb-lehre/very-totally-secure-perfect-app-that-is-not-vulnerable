@@ -24,7 +24,7 @@ logging:
   pattern:
     dateformat: HH:mm:ss
   level:
-    root: TRACE
+    # root: TRACE
     org:
       springframework:
         beans:

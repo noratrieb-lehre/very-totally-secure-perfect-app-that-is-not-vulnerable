@@ -8,15 +8,14 @@ import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMock
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.web.reactive.server.WebTestClient;
 
-import java.nio.charset.StandardCharsets;
-import java.util.Base64;
-
 @AutoConfigureMockMvc
 @SpringBootTest
 public class BlogApiTests implements WithAssertions {
 
     @Autowired
     private WebTestClient webClient;
+    @Autowired
+    private TestHelper testHelper;
 
     @Test
     void getBlogsUnauthenticated() {
@@ -34,48 +33,26 @@ public class BlogApiTests implements WithAssertions {
     }
 
     @Test
-    void createBlogAuthenticatedNoCsrf() {
+    void createBlogAuthenticatedNoPerms() {
+        var authToken = testHelper.login("thesHyper7", "mBnXneOpktnfRqPMgf6SQxwsBVRqaH");
+
         webClient.post()
                 .uri("/api/blog")
-                .header("Authorization", "")
-                .bodyValue(new BlogEntity().setTitle("i hacked y'all").setBody("for real"))
+                .header("Authorization", authToken)
+                .bodyValue(new BlogEntity().setTitle("i am an evil hacker with no permissions")
+                        .setBody("yes yes yes"))
                 .exchange()
                 .expectStatus()
                 .isForbidden();
     }
 
     @Test
-    void getContainsCsrfTokenCookie() {
-        webClient.get().uri("/api/blog").exchange().expectCookie().exists("XSRF-TOKEN");
-    }
-
-    @Test
-    void createBlogAuthenticatedWithCsrfBadCredentials() {
-        var csrfToken = "iJqUiW2G2gevMfz/xpk7fV1nLqYAeJUPNx4ZNHmx";
-
-        webClient.post()
-                .uri("/api/blog")
-                .header("Authorization", "Basic " + Base64.getEncoder()
-                        .encodeToString("evil:hacker".getBytes(StandardCharsets.UTF_8)))
-                .header("X-XSRF-TOKEN", csrfToken)
-                .cookie("XSRF-TOKEN", csrfToken)
-                .bodyValue(new BlogEntity().setTitle("i am an evil hacker with the wrong password")
-                        .setBody("yes yes yes"))
-                .exchange()
-                .expectStatus()
-                .isUnauthorized();
-    }
-
-    @Test
     void createBlogAuthenticatedWithCsrfGoodCredentials() {
-        var csrfToken = "iJqUiW2G2gevMfz/xpk7fV1nLqYAeJUPNx4ZNHmx";
+        var authToken = testHelper.login("admin", "super5ecret");
 
         webClient.post()
                 .uri("/api/blog")
-                .header("Authorization", "Basic " + Base64.getEncoder()
-                        .encodeToString("admin:super5ecret".getBytes(StandardCharsets.UTF_8)))
-                .header("X-XSRF-TOKEN", csrfToken)
-                .cookie("XSRF-TOKEN", csrfToken)
+                .header("Authorization", authToken)
                 .bodyValue(new BlogEntity().setTitle("i am the real admin").setBody("yes yes yes"))
                 .exchange()
                 .expectStatus()

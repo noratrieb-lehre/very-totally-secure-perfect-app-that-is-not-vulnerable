@@ -27,7 +27,12 @@ public class BasicConfiguration {
 
         return http.oauth2ResourceServer((server) -> server.jwt(jwt -> jwt.jwtAuthenticationConverter(
                         authenticationConverter())))
-                .csrf(cfg -> cfg.ignoringRequestMatchers("/api/user/login")
+                // CSRF is not really a concern for us since we use JWTs in an Authorization header, which
+                // are immune to CSRF because the browser does not set them automatically.
+                // We keep CSRF protection enabled anyway in case there are endpoints in the future where it matters
+                // as an additional layer of security.
+                .csrf(cfg -> cfg
+                        .ignoringRequestMatchers("/api/user/login")
                         .csrfTokenRepository(CookieCsrfTokenRepository.withHttpOnlyFalse())
                         .csrfTokenRequestHandler(handler))
                 .authorizeHttpRequests(auth -> auth
