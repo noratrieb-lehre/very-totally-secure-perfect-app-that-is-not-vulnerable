@@ -1,5 +1,6 @@
 package ch.bbw.m183.vulnerapp.datamodel;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.Id;
@@ -24,6 +25,9 @@ public class BlogEntity {
     @Id
     UUID id;
 
+    /**
+     * The date when the blog was written, in UTC.
+     */
     @Column
     @CreationTimestamp
     @NotNull(message = "created date must be specified") LocalDateTime createdAt;

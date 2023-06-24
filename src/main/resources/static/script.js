@@ -70,13 +70,33 @@ function fetchBlogs() {
 }
 
 function renderBlogs(blogs) {
+    // We use DOM operations here to avoid injections like XSS and other fun issues.
     const blogDiv = document.getElementById("blog-container");
-    blogDiv.innerHTML = "" // clear
-    for (const blog of blogs) {
-        blogDiv.innerHTML += `<h2>${blog.title}</h2>
-            <p>${blog.createdAt}</p>
-            <p>${blog.body}</p>`;
-    }
+
+    const newBlogChildren = blogs.map((blog) => {
+        const blogWrapper = document.createElement("div");
+        const title = document.createElement("h2");
+
+        title.textContent = blog.title;
+        blogWrapper.appendChild(title);
+        const createdAt = document.createElement("p");
+
+        createdAt.textContent = renderUtcTime(blog.createdAt);
+        blogWrapper.appendChild(createdAt);
+        const body = document.createElement("p");
+
+        body.textContent = blog.body;
+        blogWrapper.appendChild(body);
+        return blogWrapper;
+    });
+
+    blogDiv.replaceChildren(...newBlogChildren);
+}
+
+function renderUtcTime(time) {
+    const date = new Date(time);
+    const pad = (s) => s.toString().padStart(2, '0');
+    return `${date.getFullYear()}-${pad(date.getMonth() + 1)}-${pad(date.getDate())} ${pad(date.getHours())}:${pad(date.getMinutes())}`;
 }
 
 function filterOk(response) {
