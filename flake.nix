@@ -1,5 +1,5 @@
 {
-  description = "A very basic flake";
+  description = "improving the security of the vulnerapp with spring security";
 
   inputs = {
     nixpkgs.url = "github:NixOS/nixpkgs";
