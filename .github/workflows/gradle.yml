@@ -32,3 +32,7 @@ jobs:
       uses: gradle/gradle-build-action@749f47bda3e44aa060e82d7b3ef7e40d953bd629
       with:
         arguments: test
+    - uses: actions/upload-artifact@65d862660abb392b8c4a3d1195a2108db131dd05
+      with:
+        name: reports
+        path: build/reports
