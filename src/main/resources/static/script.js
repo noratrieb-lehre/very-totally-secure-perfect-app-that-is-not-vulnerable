@@ -5,23 +5,34 @@ document.getElementById("login-form").addEventListener("submit", onLoginSubmit);
 document.getElementById("logout-form").addEventListener("submit", onLogoutSubmit);
 document.getElementById("blog-form").addEventListener("submit", onBlogSubmit);
 
+function withErrorHandler(errorElemId, promise) {
+    const errorElem = document.getElementById(errorElemId);
+    errorElem.classList.add("hidden");
+    promise.catch((error) => {
+        errorElem.textContent = error;
+        errorElem.classList.remove("hidden");
+    });
+}
+
 function onLoginSubmit(event) {
     const username = event.target[0].value;
     const password = event.target[1].value;
     event.preventDefault();
-    fetch("/api/user/login", {
-        method: 'POST',
-        headers: {
-            "Content-Type": "application/json",
-        },
-        body: JSON.stringify({username, password}),
-    }).then(filterOk)
-        .then(response => response.json())
-        .then(response => {
-            window.sessionStorage.setItem("token", response.token)
-            window.sessionStorage.setItem("fullname", response.fullname)
-        })
-        .then(() => loginCheck());
+    withErrorHandler("login-error",
+        fetch("/api/user/login", {
+            method: 'POST',
+            headers: {
+                "Content-Type": "application/json",
+            },
+            body: JSON.stringify({username, password}),
+        }).then(filterOk)
+            .then(response => response.json())
+            .then(response => {
+                window.sessionStorage.setItem("token", response.token)
+                window.sessionStorage.setItem("fullname", response.fullname)
+            })
+            .then(() => loginCheck())
+    );
 }
 
 function onLogoutSubmit(event) {
@@ -34,16 +45,19 @@ function onLogoutSubmit(event) {
 function onBlogSubmit(event) {
     const data = {"title": event.target[0].value, "body": event.target[1].value}
     event.preventDefault();
-    fetch("/api/blog", {
-        method: "POST",
-        headers: {
-            "Authorization": `Bearer ${window.sessionStorage.getItem("token")}`,
-            "Content-Type": "application/json",
-        },
-        body: JSON.stringify(data),
-    }).then(filterOk)
-        .then(() => fetchBlogs())
-        .then(() => event.target.reset())
+
+    withErrorHandler("new-blog-error",
+        fetch("/api/blog", {
+            method: "POST",
+            headers: {
+                "Authorization": `Bearer ${window.sessionStorage.getItem("token")}`,
+                "Content-Type": "application/json",
+            },
+            body: JSON.stringify(data),
+        }).then(filterOk)
+            .then(() => fetchBlogs())
+            .then(() => event.target.reset())
+    );
 }
 
 // switch display based on login status
@@ -92,9 +106,15 @@ function renderUtcTime(time) {
     return `${date.getFullYear()}-${pad(date.getMonth() + 1)}-${pad(date.getDate())} ${pad(date.getHours())}:${pad(date.getMinutes())}`;
 }
 
-function filterOk(response) {
+async function filterOk(response) {
     if (response.ok) {
         return response;
     }
-    return Promise.reject(response);
+    if (response.status === 400) {
+        return Promise.reject("Invalid input")
+    }
+    if (response.status === 403 || response.status === 401) {
+        return Promise.reject("No permissions")
+    }
+    return Promise.reject(await response.text());
 }
