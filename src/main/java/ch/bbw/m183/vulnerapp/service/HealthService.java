@@ -22,8 +22,6 @@ public class HealthService {
 
     @SneakyThrows
     public String health() {
-        System.out.println(ctx.getWebServer().getPort());
-
         // create an admin JWT
         Map<String, String> claims = new HashMap<>();
         claims.put("username", "admin");
