@@ -63,12 +63,11 @@ public class AdminService {
                         .setRoles(List.of(poster)),
                 new UserEntity().setUsername("thesHyper7")
                         .setFullname("Desir Eh")
-                        .setPassword("m/u5wvGRaUX1XBnXneOpktnfRqPCnG7+ogXFUv6Mgf6SQxws8Rq2hoMEKLZEdIHoE0qsbEvgTdBVRqaH")
+                        .setPassword("mBnXneOpktnfRqPMgf6SQxwsBVRqaH")
                         .setRoles(List.of(reader))
         ).forEach(this::createUser);
     }
 
-    @Transactional
     Role createRoleIfNotFound(String name) {
         return roleRepository.findByName(name).orElseGet(() -> {
             var role = new Role(name);

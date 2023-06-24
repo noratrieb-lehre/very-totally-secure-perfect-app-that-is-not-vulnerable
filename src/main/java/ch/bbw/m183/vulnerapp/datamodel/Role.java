@@ -16,8 +16,6 @@ public class Role {
     @NotBlank(message = "name must not be empty")
     private String name;
 
-    // @ManyToMany(mappedBy = "roles")
-    // private Collection<UserEntity> users;
     public Role() {}
 
     public Role(String name) {
