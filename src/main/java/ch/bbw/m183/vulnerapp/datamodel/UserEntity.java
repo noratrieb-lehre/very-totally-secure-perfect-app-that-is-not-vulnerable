@@ -17,14 +17,15 @@ import java.util.Collection;
 public class UserEntity {
 
     @Id
-    @NotBlank(message = "username must not be empty") String username;
+    @NotBlank(message = "username must not be empty")
+    String username;
 
     @Column
-    @NotBlank(message = "full name must not be empty") String fullname;
+    @NotBlank(message = "full name must not be empty")
+    String fullname;
 
     @Column
     @NotBlank(message = "password must not be empty")
-    @Length(min = 8)
     String password;
 
     @ManyToMany(fetch = FetchType.EAGER)

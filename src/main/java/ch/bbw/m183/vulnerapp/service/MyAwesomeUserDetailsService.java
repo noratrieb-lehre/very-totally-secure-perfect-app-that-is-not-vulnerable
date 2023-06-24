@@ -12,7 +12,6 @@ import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.stereotype.Service;
 
-import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
 
@@ -25,23 +24,24 @@ public class MyAwesomeUserDetailsService implements UserDetailsService {
 
     @Override
     public UserDetails loadUserByUsername(String username) {
-        log.error("aaaaaaaaaaa");
+        log.info("Trying to load {}", username);
         var user = userRepository.findById(username)
                 .map(entity -> new User(entity.getUsername(),
-                                        entity.getPassword(),
-                                        this.getAuthorities(entity.getRoles())
+                        entity.getPassword(),
+                        this.getAuthorities(entity.getRoles())
                 ))
-                .orElseGet(() -> new User(
-                        " ",
-                        " ",
-                        this.getAuthorities(List.of(this.roleRepository.findByName("READER")
-                                                            .orElseThrow(() -> new RuntimeException(("READER role not found")))))
-                ));
+                .orElseGet(() -> {
+                    log.info("Could not find user, falling back to empty user.");
+                    return new User(
+                            " ",
+                            " ",
+                            this.getAuthorities(List.of(this.roleRepository.findByName("READER")
+                                    .orElseThrow(() -> new RuntimeException(("READER role not found")))))
+                    );
+                });
 
-        log.error("AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAaa");
-        log.error("AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAaa");
-        log.error(user.getUsername());
-        log.error(Arrays.toString(user.getAuthorities().toArray()));
+        log.info("Successfully loaded user {}", user.getUsername());
+
         return user;
     }
 

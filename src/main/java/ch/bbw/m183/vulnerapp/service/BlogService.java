@@ -2,6 +2,7 @@ package ch.bbw.m183.vulnerapp.service;
 
 import ch.bbw.m183.vulnerapp.datamodel.BlogEntity;
 import ch.bbw.m183.vulnerapp.repository.BlogRepository;
+import ch.bbw.m183.vulnerapp.webmodel.NewBlog;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.event.ContextRefreshedEvent;
@@ -30,21 +31,25 @@ public class BlogService {
 
 
     @PreAuthorize("hasAuthority('POSTER')")
-    public UUID createBlog(BlogEntity blog) {
-        blog.setId(UUID.randomUUID());
-        // This can actually be null.
-        if (blog.getCreatedAt() == null ) {
-            // Dates and times, my seemingly eternal enemy. Getting dates and times correct is always way harder
-            // than it should be. I wanted to make it so that all dates are UTC and then rendered nicely with the local
-            // time in the frontend. A seemingly reasonable decision. But somehow, the API response always messed
-            // up the dates. They were created nicely at the current UTC time here but then in the API response
-            // I got my local time. Something is messing up the time (maybe the database?) and I've given up,
-            // just using the local time here. But it hurts a lot. I'm sorry.
-            LocalDateTime createdAt = LocalDateTime.now();
-            blog.setCreatedAt(createdAt);
-        }
-        log.info("Created new blog post at {} with title `{}`", blog.getCreatedAt(), blog.getTitle());
-        return blogRepository.save(blog).getId();
+    public UUID createBlog(NewBlog newBlog) {
+        var id = UUID.randomUUID();
+
+        // Dates and times, my seemingly eternal enemy. Getting dates and times correct is always way harder
+        // than it should be. I wanted to make it so that all dates are UTC and then rendered nicely with the local
+        // time in the frontend. A seemingly reasonable decision. But somehow, the API response always messed
+        // up the dates. They were created nicely at the current UTC time here but then in the API response
+        // I got my local time. Something is messing up the time (maybe the database?) and I've given up,
+        // just using the local time here. But it hurts a lot. I'm sorry.
+        LocalDateTime createdAt = LocalDateTime.now();
+
+        var entity = new BlogEntity(id, createdAt, newBlog.title(), newBlog.body());
+        log.info("Created new blog post at {} with title `{}`", entity.getCreatedAt(), entity.getTitle());
+        return blogRepository.save(entity).getId();
+    }
+
+    private void createBlogFromEntity(BlogEntity newBlog) {
+        newBlog.setId(UUID.randomUUID());
+        this.blogRepository.save(newBlog);
     }
 
     @EventListener(ContextRefreshedEvent.class)
@@ -73,6 +78,6 @@ public class BlogService {
                                 input validation, output encoding, and the use of Content Security Policy (CSP).
                                 """.stripIndent())
                         .setCreatedAt(LocalDateTime.of(2023, 1, 1, 1, 1))
-        ).forEach(this::createBlog);
+        ).forEach(this::createBlogFromEntity);
     }
 }

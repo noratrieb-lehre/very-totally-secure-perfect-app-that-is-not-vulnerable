@@ -1,6 +1,7 @@
 package ch.bbw.m183.vulnerapp;
 
 import ch.bbw.m183.vulnerapp.datamodel.UserEntity;
+import ch.bbw.m183.vulnerapp.webmodel.NewUser;
 import org.assertj.core.api.WithAssertions;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -93,5 +94,31 @@ public class AdminApiTests implements WithAssertions {
                 .exchange()
                 .expectStatus()
                 .isOk();
+    }
+
+    @Test
+    void createUserShortPassword() {
+        var authToken = testHelper.login("admin", "super5ecret");
+
+        webClient.post()
+                .uri("/api/admin123/create")
+                .header("Authorization", authToken)
+                .bodyValue(new NewUser("testuser", "abcd", "test user"))
+                .exchange()
+                .expectStatus()
+                .isBadRequest();
+    }
+
+    @Test
+    void createUserRepeatedPassword() {
+        var authToken = testHelper.login("admin", "super5ecret");
+
+        webClient.post()
+                .uri("/api/admin123/create")
+                .header("Authorization", authToken)
+                .bodyValue(new UserEntity().setUsername("testuser").setPassword("uuuuuuuwuuuuuuu").setFullname("test user"))
+                .exchange()
+                .expectStatus()
+                .isBadRequest();
     }
 }
