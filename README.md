@@ -92,3 +92,10 @@ for further inspection if desired. There's also a small badge in the README.
 
 To allow NixOS users (me!) to work on the vulnerapp. No nix build has been set up because gradle is
 an absolute nix nightmare. Maven should be less painful, but I haven't bothered to switch.
+
+# Problems
+
+Working with spring security was not very nice. Thanks to the deep magic behind it all, misconfigurations were
+very hard to debug, even with the highest level of `TRACE` logging. Security is fundamentally a hard problem and
+exposing the configs more to the user is not always a good thing, but the way spring security hides everything
+does make it hard.
