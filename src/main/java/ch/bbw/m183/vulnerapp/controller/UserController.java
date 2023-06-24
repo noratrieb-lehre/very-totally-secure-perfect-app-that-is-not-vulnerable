@@ -1,12 +1,12 @@
 package ch.bbw.m183.vulnerapp.controller;
 
-import ch.bbw.m183.vulnerapp.datamodel.UserEntity;
 import ch.bbw.m183.vulnerapp.service.LoginService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.core.annotation.AuthenticationPrincipal;
-import org.springframework.security.core.userdetails.User;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
 
 @RestController
 @RequestMapping("/api/user")
@@ -20,12 +20,9 @@ public class UserController {
         return ResponseEntity.ok(this.loginService.login(login));
     }
 
-    @GetMapping("/whoami")
-    public ResponseEntity<UserEntity> whoami(@AuthenticationPrincipal User user) {
-        return loginService.whoami(user.getUsername());
+    public record LoginResponse(String token, String fullname) {
     }
 
-    public record LoginResponse(String token, String fullname) {}
-
-    public record Login(String username, String password) {}
+    public record Login(String username, String password) {
+    }
 }

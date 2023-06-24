@@ -2,13 +2,11 @@ package ch.bbw.m183.vulnerapp.service;
 
 import ch.bbw.m183.vulnerapp.controller.UserController;
 import ch.bbw.m183.vulnerapp.datamodel.Role;
-import ch.bbw.m183.vulnerapp.datamodel.UserEntity;
 import ch.bbw.m183.vulnerapp.repository.UserRepository;
 import ch.bbw.m183.vulnerapp.security.JwtHelper;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -27,12 +25,6 @@ public class LoginService {
     private final UserRepository userRepository;
     private final PasswordEncoder passwordEncoder;
     private final JwtHelper jwtHelper;
-
-    public ResponseEntity<UserEntity> whoami(String username) {
-        return userRepository.findById(username)
-                .map(ResponseEntity::ok)
-                .orElseThrow(() -> new RuntimeException(("Logged in username was not found: " + username)));
-    }
 
     public UserController.LoginResponse login(UserController.Login login) {
         var userEntity = userRepository.findById(login.username())

@@ -58,4 +58,17 @@ public class BlogApiTests implements WithAssertions {
                 .expectStatus()
                 .isCreated();
     }
+
+    @Test
+    void healthWithBogusHost() {
+        var authToken = testHelper.login("admin", "super5ecret");
+
+        webClient.get()
+                .uri("/api/blog/health")
+                .header("Authorization", authToken)
+                .header("Host", "only-stupid-servers-make-a-request-to-this.com")
+                .exchange()
+                .expectStatus()
+                .isOk();
+    }
 }
