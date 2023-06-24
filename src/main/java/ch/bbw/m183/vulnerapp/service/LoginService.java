@@ -44,7 +44,6 @@ public class LoginService {
 
             String authorities = userEntity.getRoles().stream().map(Role::getName).collect(Collectors.joining(" "));
             claims.put("roles", authorities);
-            claims.put("userId", String.valueOf(1));
 
             String jwt = jwtHelper.createJwtForClaims(login.username(), claims);
             return new UserController.LoginResponse(jwt, userEntity.getFullname());
