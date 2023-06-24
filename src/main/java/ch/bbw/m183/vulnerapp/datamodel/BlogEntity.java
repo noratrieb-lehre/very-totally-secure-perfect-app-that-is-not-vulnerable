@@ -24,6 +24,9 @@ public class BlogEntity {
     @Id
     UUID id;
 
+    /**
+     * The date when the blog was written, in UTC.
+     */
     @Column
     @CreationTimestamp
     @NotNull(message = "created date must be specified") LocalDateTime createdAt;

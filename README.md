@@ -1,3 +1,5 @@
+[![Java CI with Gradle](https://github.com/Nilstrieb/very-totally-secure-perfect-app-that-is-not-vulnerable/actions/workflows/gradle.yml/badge.svg)](https://github.com/Nilstrieb/very-totally-secure-perfect-app-that-is-not-vulnerable/actions/workflows/gradle.yml)
+
 # Vulnerapp
 
 -- A Vulnerable Sample Spring Boot Application
