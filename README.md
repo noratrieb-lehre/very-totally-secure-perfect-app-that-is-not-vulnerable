@@ -84,6 +84,12 @@ tools showed it as code, but I did not observe its side effects. But with my fix
 The password is hashed using a delegating password encoding, bcrypt by default. This makes sure that the plaintext
 password cannot be stolen.
 
+### Pinned GH Actions workflows
+
+All GitHub actions used are pinned to their commit hash, ensuring that potential malicious updates cannot
+affect our builds. It does introduce a little more overhead to maintain and the danger of updating vulnerable
+actions too late, although the chance of severe vulnerabilites is quite low.
+
 ## Other Improvements
 
 There are also two UI changes in the frontend. Error messages from validation/login are now shown as bootstrap

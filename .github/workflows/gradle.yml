@@ -28,10 +28,15 @@ jobs:
       with:
         java-version: '18'
         distribution: 'temurin'
-    - name: Build with Gradle
-      uses: gradle/gradle-build-action@749f47bda3e44aa060e82d7b3ef7e40d953bd629
+    - name: Install Nix
+      uses: cachix/install-nix-action@6ed004b9ccb68dbc28e7c85bee15fa93dbd214ac
       with:
-        arguments: test
+        github_access_token: ${{ secrets.GITHUB_TOKEN }}
+    - name: Check nix flake
+      run: nix flake check
+    - name: Run tests
+      # We're not using nix build, this is a gradle project.
+      run: nix develop --command bash -c './gradlew test'
     - uses: actions/upload-artifact@65d862660abb392b8c4a3d1195a2108db131dd05
       with:
         name: reports
