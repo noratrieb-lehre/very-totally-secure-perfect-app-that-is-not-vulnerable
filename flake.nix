@@ -9,8 +9,7 @@
     let
       overlays = [
         (self: super:
-          let jdk = super.openjdk20; in
-          # sets jre/jdk overrides that use the openjdk20 package
+          let jdk = super.jdk; in
           {
             jre = jdk;
             inherit jdk;
@@ -34,6 +33,7 @@
         default = pkgs.mkShell {
           packages = with pkgs; [
             gradle
+            jdk
           ];
         };
       });
